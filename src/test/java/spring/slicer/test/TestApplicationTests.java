@@ -1,13 +1,23 @@
 package spring.slicer.test;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@SpringBootTest
+import io.github.sctf.annotation.TargetComponent;
+import io.github.sctf.annotation.TargetComponentTest;
+import io.github.sctf.example.ExampleService;
+
+@TargetComponentTest
+@TargetComponent({ExampleService.class})
 class TestApplicationTests {
 
+	@Autowired
+	ExampleService exampleService;
+
 	@Test
-	void contextLoads() {
+	void test() throws Exception{
+		exampleService.sum(1, 2);
+
 	}
 
 }

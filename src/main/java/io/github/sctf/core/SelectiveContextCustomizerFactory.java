@@ -34,9 +34,8 @@ public class SelectiveContextCustomizerFactory implements ContextCustomizerFacto
         // ==========================================
 
         // TODO: 3. 스캐너(DependencyGraphScanner)를 호출해서 필요한 의존성을 싹 다 찾아옵니다.
-        // DependencyGraphScanner scanner = new DependencyGraphScanner();
-        // Set<Class<?>> scannedClasses = scanner.scan(rootClasses);
-        Set<Class<?>> scannedClasses = Set.of(rootClasses); // 일단 컴파일을 위해 임시로 원본만 넣습니다.
+        DependencyGraphScanner scanner = new DependencyGraphScanner();
+        Set<Class<?>> scannedClasses = scanner.scan(rootClasses);
 
         // TODO: 4. 찾아온 클래스 목록으로 캐시 키 생성기(SelectiveCacheKeyGenerator)를 돌려 해시를 만듭니다.
         // SelectiveCacheKeyGenerator keyGenerator = new SelectiveCacheKeyGenerator();
