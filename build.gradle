@@ -2,11 +2,20 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.11'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'maven-publish'
 }
 
-group = 'spring.slicer'
+group = 'io.github.sctf' 
 version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
+description = 'Spring Selective Context Test Framework'
+
+bootJar{
+	enabled = false
+}
+
+jar {
+	enabled = true
+}
 
 java {
 	toolchain {
@@ -20,7 +29,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
