@@ -34,7 +34,8 @@ public class SelectiveContextCustomizerFactory implements ContextCustomizerFacto
         Set<Class<?>> scannedClasses = scanner.scan(rootClasses);
 
         // 4. 찾아온 클래스 목록으로 캐시 키 생성기(SelectiveCacheKeyGenerator)를 돌려 해시 생성
-        String hashKey = "temp-hash-key-123"; // 일단 임시 해시 키
+        SelectiveCacheKeyGenerator generator = new SelectiveCacheKeyGenerator();
+        String hashKey = generator.generateKey(scannedClasses); // 일단 임시 해시 키
 
         // 5. selective context contommizer에게 bean definition을 전부 만들기를 위임
         return new SelectiveContextCustomizer(scannedClasses, hashKey);

@@ -25,7 +25,8 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
 
     @Override
     public void customizeContext(ConfigurableApplicationContext context, MergedContextConfiguration mergedConfig) {
-
+        System.out.println("hash key : " + hashKey);
+        
         // 1. 의존성 scan된 class가 없으면 context 생성 종료
         if(scannedClasses == null || scannedClasses.isEmpty()){
             return;
