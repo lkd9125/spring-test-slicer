@@ -12,7 +12,7 @@ public class CoreTest {
     @Test
     void dependencyGraphScan() throws Exception{
         DependencyGraphScanner scanner = new DependencyGraphScanner();
-        Set<Class<?>> classSet = scanner.scan(new Class[]{ExampleService.class});
+        Set<Class<?>> classSet = scanner.scan(new Class[]{ExampleService.class}, "");
 
         for(Class<?> clazz : classSet){
             System.out.println(clazz);

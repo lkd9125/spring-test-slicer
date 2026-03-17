@@ -3,6 +3,7 @@ package io.github.sctf.core;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +24,13 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
     private final Set<Class<?>> scannedClasses;
     private final String hashKey;
     private final boolean withDatabase;
+    private final String basePackage;
 
-    public SelectiveContextCustomizer(Set<Class<?>> scannedClasses, String hashKey, boolean withDatabase) {
+    public SelectiveContextCustomizer(Set<Class<?>> scannedClasses, String hashKey, boolean withDatabase, String basePackage) {
         this.scannedClasses = scannedClasses;
         this.hashKey = hashKey;
         this.withDatabase = withDatabase;
+        this.basePackage = basePackage;
     }
 
 
@@ -43,8 +46,10 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
         BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context.getBeanFactory();
 
         // 2. ComponentScan 전면 차단 — 빈 등록은 아래에서 수동으로 처리
-        // RootBeanDefinition filterDef = new RootBeanDefinition(SelectiveTypeExcludeFilter.class);
-        // registry.registerBeanDefinition("selectiveTypeExcludeFilter", filterDef);
+        RootBeanDefinition filterDef = new RootBeanDefinition(SelectiveTypeExcludeFilter.class);
+        filterDef.getConstructorArgumentValues().addGenericArgumentValue(this.scannedClasses);
+        filterDef.getConstructorArgumentValues().addGenericArgumentValue(this.basePackage);
+        registry.registerBeanDefinition("selectiveTypeExcludeFilter", filterDef);
 
         // 3. spring 자동 설정 off
         if (!withDatabase) {
@@ -52,9 +57,13 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
             TestPropertyValues.of("spring.boot.enableautoconfiguration=false").applyTo(context);
         }
 
+        Set<Class<?>> concreteClasses = scannedClasses.stream()
+                .filter(clazz -> !clazz.isInterface()) // 인터페이스 컷!
+                .collect(Collectors.toSet());
+
         // 4. class -> bean defintion으로 변환
         BeanDefinitionCollector collector = new BeanDefinitionCollector();
-        List<BeanDefinition> definitions = collector.collect(scannedClasses);
+        List<BeanDefinition> definitions = collector.collect(concreteClasses);
 
         // 5. bean defintion을 bean으로 등록
         BeanNameGenerator nameGenerator = new AnnotationBeanNameGenerator();

@@ -21,4 +21,6 @@ public @interface TargetComponentTest {
 
     boolean withDatabase() default true;
 
+    String basePackage();
+
 }

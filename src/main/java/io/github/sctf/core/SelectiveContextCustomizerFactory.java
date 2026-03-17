@@ -27,6 +27,7 @@ public class SelectiveContextCustomizerFactory implements ContextCustomizerFacto
         // 3. db 자동설정 여부
         TargetComponentTest testAnnotation = TestContextAnnotationUtils.findMergedAnnotation(testClass, TargetComponentTest.class);
         boolean withDatabase = (testAnnotation != null) && testAnnotation.withDatabase();
+        String basePackage = testAnnotation.basePackage();
 
         // 지정된 value class가 없는 경우 exception
         Class<?>[] rootClasses = targetAnnotation.value();
@@ -36,14 +37,14 @@ public class SelectiveContextCustomizerFactory implements ContextCustomizerFacto
 
         // 4. TargetComponent의 필요한 의존성 조회
         DependencyGraphScanner scanner = new DependencyGraphScanner();
-        Set<Class<?>> scannedClasses = scanner.scan(rootClasses);
+        Set<Class<?>> scannedClasses = scanner.scan(rootClasses, basePackage);
 
         // 5. 찾아온 클래스 목록으로 캐시 키 생성기(SelectiveCacheKeyGenerator)를 돌려 해시 생성
         SelectiveCacheKeyGenerator generator = new SelectiveCacheKeyGenerator();
         String hashKey = generator.generateKey(scannedClasses); // 일단 임시 해시 키
 
         // 6. selective context contommizer에게 bean definition을 전부 만들기를 위임
-        return new SelectiveContextCustomizer(scannedClasses, hashKey, withDatabase);
+        return new SelectiveContextCustomizer(scannedClasses, hashKey, withDatabase, basePackage);
     }
 
 }
