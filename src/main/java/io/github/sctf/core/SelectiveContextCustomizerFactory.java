@@ -11,8 +11,31 @@ import org.springframework.test.context.TestContextAnnotationUtils;
 import io.github.sctf.annotation.TargetComponent;
 import io.github.sctf.annotation.TargetComponentTest;
 
+/**
+ * {@link ContextCustomizerFactory} 구현체로, {@code META-INF/spring.factories}를 통해
+ * Spring Test에 자동 등록된다.
+ *
+ * <p>테스트 클래스에 {@link TargetComponent @TargetComponent} 어노테이션이 있을 경우,
+ * 의존성 그래프를 스캔하고 {@link SelectiveContextCustomizer}를 생성하여 반환한다.
+ * 어노테이션이 없으면 {@code null}을 반환하여 Spring 기본 동작을 수행하게 한다.</p>
+ *
+ * @see SelectiveContextCustomizer
+ * @see DependencyGraphScanner
+ * @see SelectiveCacheKeyGenerator
+ */
 public class SelectiveContextCustomizerFactory implements ContextCustomizerFactory{
 
+    /**
+     * 테스트 클래스의 어노테이션을 분석하여 {@link SelectiveContextCustomizer}를 생성한다.
+     *
+     * <p>{@link TargetComponent @TargetComponent}가 없으면 {@code null}을 반환한다.
+     * 타겟 클래스가 지정되지 않은 경우 {@link IllegalArgumentException}을 발생시킨다.</p>
+     *
+     * @param testClass        테스트 클래스
+     * @param configAttributes 컨텍스트 설정 속성 목록
+     * @return {@link SelectiveContextCustomizer} 또는 {@code null}
+     * @throws IllegalArgumentException {@code @TargetComponent}에 타겟 클래스가 지정되지 않은 경우
+     */
     @Override
     public ContextCustomizer createContextCustomizer(Class<?> testClass, List<ContextConfigurationAttributes> configAttributes) {
         

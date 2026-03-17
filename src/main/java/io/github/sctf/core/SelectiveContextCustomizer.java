@@ -17,6 +17,23 @@ import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.test.context.ContextCustomizer;
 import org.springframework.test.context.MergedContextConfiguration;
 
+/**
+ * 스캔된 의존성 클래스만 선택적으로 ApplicationContext에 등록하는 {@link ContextCustomizer} 구현체.
+ *
+ * <p>이 클래스는 다음 작업을 수행한다:</p>
+ * <ol>
+ *   <li>{@link SelectiveTypeExcludeFilter}를 등록하여 불필요한 컴포넌트 스캔을 차단</li>
+ *   <li>{@code withDatabase} 설정에 따라 Spring 자동 설정을 제어</li>
+ *   <li>스캔된 구체 클래스들을 {@link BeanDefinition}으로 변환하여 수동 등록</li>
+ * </ol>
+ *
+ * <p>{@code equals}와 {@code hashCode}는 해시 키 기반으로 구현되어
+ * Spring Test의 컨텍스트 캐싱에 활용된다.</p>
+ *
+ * @see SelectiveContextCustomizerFactory
+ * @see SelectiveTypeExcludeFilter
+ * @see BeanDefinitionCollector
+ */
 public class SelectiveContextCustomizer implements ContextCustomizer{
 
     private static final Logger log = LoggerFactory.getLogger(SelectiveContextCustomizer.class);
@@ -26,6 +43,14 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
     private final boolean withDatabase;
     private final String basePackage;
 
+    /**
+     * SelectiveContextCustomizer를 생성한다.
+     *
+     * @param scannedClasses 의존성 그래프에서 탐색된 클래스 집합
+     * @param hashKey        컨텍스트 캐싱에 사용되는 SHA-256 해시 키
+     * @param withDatabase   Spring 자동 설정(DB, Redis 등) 포함 여부
+     * @param basePackage    컴포넌트 스캔 필터링의 기준 베이스 패키지
+     */
     public SelectiveContextCustomizer(Set<Class<?>> scannedClasses, String hashKey, boolean withDatabase, String basePackage) {
         this.scannedClasses = scannedClasses;
         this.hashKey = hashKey;
@@ -34,6 +59,15 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
     }
 
 
+    /**
+     * ApplicationContext를 커스터마이징하여 스캔된 의존성만 빈으로 등록한다.
+     *
+     * <p>스캔된 클래스가 없으면 아무 작업도 수행하지 않는다.
+     * 인터페이스는 빈 등록 대상에서 제외된다.</p>
+     *
+     * @param context      커스터마이징할 ApplicationContext
+     * @param mergedConfig 병합된 테스트 컨텍스트 설정
+     */
     @Override
     public void customizeContext(ConfigurableApplicationContext context, MergedContextConfiguration mergedConfig) {
         log.debug("Selective context cache key: {}", hashKey);
