@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"io.github.sctf"},{"l":"io.github.sctf.annotation"},{"l":"io.github.sctf.bootstrap"},{"l":"io.github.sctf.core"},{"l":"io.github.sctf.example"}];updateSearchResults();

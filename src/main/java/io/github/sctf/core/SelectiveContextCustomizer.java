@@ -1,5 +1,6 @@
 package io.github.sctf.core;
 
+import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -16,6 +17,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.test.context.ContextCustomizer;
 import org.springframework.test.context.MergedContextConfiguration;
+import org.springframework.util.ClassUtils;
 
 /**
  * 스캔된 의존성 클래스만 선택적으로 ApplicationContext에 등록하는 {@link ContextCustomizer} 구현체.
@@ -91,6 +93,17 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
             TestPropertyValues.of("spring.boot.enableautoconfiguration=false").applyTo(context);
         }
 
+        TestPropertyValues.of(
+            "spring.autoconfigure.exclude=" +
+            "org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration," +
+            "org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration," +
+            "org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration," +
+            "org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration"
+        ).applyTo(context);
+
+        registerMockIfPresent(registry, "org.springframework.security.authentication.ReactiveAuthenticationManager", "reactiveAuthenticationManager");
+        registerMockIfPresent(registry, "org.springframework.security.authentication.AuthenticationManager", "authenticationManager");
+
         Set<Class<?>> concreteClasses = scannedClasses.stream()
                 .filter(clazz -> !clazz.isInterface()) // 인터페이스 컷!
                 .collect(Collectors.toSet());
@@ -122,6 +135,32 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
     @Override
     public int hashCode() {
         return Objects.hash(hashKey);
+    }
+
+    /**
+     * 💡 Mockito 없이 순수 Java Reflection(JDK Dynamic Proxy)을 이용하여 
+     * 의존성 없는 완벽한 깡통(Dummy) 빈을 동적으로 등록합니다.
+     */
+    private void registerMockIfPresent(BeanDefinitionRegistry registry, String className, String beanName) {
+        try {
+            Class<?> clazz = ClassUtils.forName(className, getClass().getClassLoader());
+
+            // Spring 5+ 기능: Supplier를 이용해 깡통 객체를 빈으로 직접 등록!
+            RootBeanDefinition mockDef = new RootBeanDefinition(clazz);
+            mockDef.setInstanceSupplier(() ->
+                Proxy.newProxyInstance(
+                    clazz.getClassLoader(),
+                    new Class<?>[]{clazz},
+                    (proxy, method, args) -> null // 깡통 객체: 어떤 메서드를 호출하든 null을 반환
+                )
+            );
+
+            registry.registerBeanDefinition(beanName, mockDef);
+            
+            log.info("Sctf Framework: [{}] 순수 Java Proxy Dummy 주입 완료!", className);
+        } catch (ClassNotFoundException e) {
+            // 해당 프로젝트는 Security 모듈을 사용하지 않으므로 부드럽게 무시합니다.
+        }
     }
 
 }
