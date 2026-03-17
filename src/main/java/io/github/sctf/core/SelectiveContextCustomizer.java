@@ -4,9 +4,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
@@ -14,6 +17,8 @@ import org.springframework.test.context.ContextCustomizer;
 import org.springframework.test.context.MergedContextConfiguration;
 
 public class SelectiveContextCustomizer implements ContextCustomizer{
+
+    private static final Logger log = LoggerFactory.getLogger(SelectiveContextCustomizer.class);
 
     private final Set<Class<?>> scannedClasses;
     private final String hashKey;
@@ -28,35 +33,38 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
 
     @Override
     public void customizeContext(ConfigurableApplicationContext context, MergedContextConfiguration mergedConfig) {
-        System.out.println("hash key : " + hashKey);
-        
+        log.debug("Selective context cache key: {}", hashKey);
+
         // 1. 의존성 scan된 class가 없으면 context 생성 종료
         if(scannedClasses == null || scannedClasses.isEmpty()){
             return;
         }
 
-        // 2. spring 자동 설정 off
+        BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context.getBeanFactory();
+
+        // 2. ComponentScan 전면 차단 — 빈 등록은 아래에서 수동으로 처리
+        // RootBeanDefinition filterDef = new RootBeanDefinition(SelectiveTypeExcludeFilter.class);
+        // registry.registerBeanDefinition("selectiveTypeExcludeFilter", filterDef);
+
+        // 3. spring 자동 설정 off
         if (!withDatabase) {
-            System.out.println("🛑 [경고] DB 스위치 OFF! 스프링 자동 설정(AutoConfiguration)을 전면 차단합니다.");
-            // 스프링 부트의 자동 설정을 환경변수 조작으로 완전히 꺼버립니다!
+            log.info("Spring auto-configuration disabled (withDatabase=false)");
             TestPropertyValues.of("spring.boot.enableautoconfiguration=false").applyTo(context);
         }
-        
-        // 3. class -> bean defintion으로 변환 
+
+        // 4. class -> bean defintion으로 변환
         BeanDefinitionCollector collector = new BeanDefinitionCollector();
         List<BeanDefinition> definitions = collector.collect(scannedClasses);
-        
-        // 4. bean defintion을 bean으로 등록
-        BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context.getBeanFactory();
+
+        // 5. bean defintion을 bean으로 등록
         BeanNameGenerator nameGenerator = new AnnotationBeanNameGenerator();
-        
+
         for (BeanDefinition definition : definitions) {
-            // 빈의 고유 이름은 클래스명 + 인덱스로 겹치지 않게 지어줍니다.
             String beanName = nameGenerator.generateBeanName(definition, registry);
             registry.registerBeanDefinition(beanName, definition);
-            System.out.println("bean definition 등록 완료: " + beanName);
+            log.info("Bean definition registered: {}", beanName);
         }
-        
+
     }
 
     // 캐시 키로 사용하기 위해 equals와 hashCode를 해시 키 기반으로 오버라이드!
