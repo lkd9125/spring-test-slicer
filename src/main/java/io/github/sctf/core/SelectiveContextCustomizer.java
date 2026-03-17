@@ -138,8 +138,22 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
     }
 
     /**
-     * 💡 Mockito 없이 순수 Java Reflection(JDK Dynamic Proxy)을 이용하여 
-     * 의존성 없는 완벽한 깡통(Dummy) 빈을 동적으로 등록합니다.
+     * 주어진 타입명을 로드할 수 있을 때, 해당 타입을 위한 <em>더미(Proxy) 빈</em>을 동적으로 등록합니다.
+     *
+     * <p>이 메서드는 Mockito 같은 mocking 라이브러리를 사용하지 않고, JDK Dynamic Proxy를 이용해
+     * 어떤 메서드를 호출하더라도 {@code null}을 반환하는 인스턴스를 생성해 빈으로 제공합니다.</p>
+     *
+     * <h3>주의/제약</h3>
+     * <ul>
+     *   <li>JDK Proxy는 <strong>인터페이스</strong>만 프록시할 수 있습니다. (구체 클래스는 불가)</li>
+     *   <li>프록시가 항상 {@code null}을 반환하므로, 기본 타입 반환(예: {@code int})이나
+     *       {@code toString}/{@code equals}/{@code hashCode}에 의존하는 코드는 예상치 못한 동작을 할 수 있습니다.</li>
+     *   <li>타입이 클래스패스에 없으면 {@link ClassNotFoundException}이 발생하며, 이 경우 조용히 무시합니다.</li>
+     * </ul>
+     *
+     * @param registry 빈을 등록할 레지스트리
+     * @param className 로드할 대상 타입의 FQCN (Fully Qualified Class Name)
+     * @param beanName 등록할 빈 이름
      */
     private void registerMockIfPresent(BeanDefinitionRegistry registry, String className, String beanName) {
         try {
