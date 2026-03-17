@@ -7,6 +7,7 @@ import java.util.Set;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.test.context.ContextCustomizer;
@@ -16,10 +17,12 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
 
     private final Set<Class<?>> scannedClasses;
     private final String hashKey;
+    private final boolean withDatabase;
 
-    public SelectiveContextCustomizer(Set<Class<?>> scannedClasses, String hashKey) {
+    public SelectiveContextCustomizer(Set<Class<?>> scannedClasses, String hashKey, boolean withDatabase) {
         this.scannedClasses = scannedClasses;
         this.hashKey = hashKey;
+        this.withDatabase = withDatabase;
     }
 
 
@@ -31,12 +34,19 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
         if(scannedClasses == null || scannedClasses.isEmpty()){
             return;
         }
+
+        // 2. spring 자동 설정 off
+        if (!withDatabase) {
+            System.out.println("🛑 [경고] DB 스위치 OFF! 스프링 자동 설정(AutoConfiguration)을 전면 차단합니다.");
+            // 스프링 부트의 자동 설정을 환경변수 조작으로 완전히 꺼버립니다!
+            TestPropertyValues.of("spring.boot.enableautoconfiguration=false").applyTo(context);
+        }
         
-        // 2. class -> bean defintion으로 변환 
+        // 3. class -> bean defintion으로 변환 
         BeanDefinitionCollector collector = new BeanDefinitionCollector();
         List<BeanDefinition> definitions = collector.collect(scannedClasses);
         
-        // 3. bean defintion을 bean으로 등록
+        // 4. bean defintion을 bean으로 등록
         BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context.getBeanFactory();
         BeanNameGenerator nameGenerator = new AnnotationBeanNameGenerator();
         

@@ -19,4 +19,6 @@ import io.github.sctf.bootstrap.SelectiveContextBootstrapper;
 @BootstrapWith(SelectiveContextBootstrapper.class)
 public @interface TargetComponentTest {
 
+    boolean withDatabase() default true;
+
 }

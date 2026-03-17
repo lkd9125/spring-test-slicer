@@ -13,6 +13,6 @@ public @interface TargetComponent {
 
     Class<?>[] value();
 
-    boolean includeParents() default true; // 기본값은 true로 설정합니다[cite: 25].
+    boolean includeParents() default true;
 
 }

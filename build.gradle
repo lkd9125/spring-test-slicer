@@ -9,6 +9,10 @@ group = 'io.github.sctf'
 version = '0.0.1-SNAPSHOT'
 description = 'Spring Selective Context Test Framework'
 
+tasks.withType(GenerateModuleMetadata).configureEach {
+    suppressedValidationErrors.add('dependencies-without-versions')
+}
+
 bootJar{
 	enabled = false
 }
@@ -33,6 +37,10 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
 }
