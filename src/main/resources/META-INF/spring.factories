@@ -1,2 +1,3 @@
+# 💡 패키지 경로가 core인지 꼭 확인하세요!
 org.springframework.test.context.ContextCustomizerFactory=\
-io.github.sctf.customizer.SelectiveContextCustomizerFactory
+io.github.sctf.core.SelectiveContextCustomizerFactory

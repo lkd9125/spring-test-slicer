@@ -9,7 +9,7 @@ import io.github.sctf.example.ExampleService;
 
 @TargetComponentTest
 @TargetComponent({ExampleService.class})
-class TestApplicationTests {
+class ExampleTest {
 
 	@Autowired
 	ExampleService exampleService;

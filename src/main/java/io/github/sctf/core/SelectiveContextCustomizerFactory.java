@@ -29,22 +29,15 @@ public class SelectiveContextCustomizerFactory implements ContextCustomizerFacto
             throw new IllegalArgumentException("@TargetComponent에 최소 1개 이상의 타겟 클래스를 지정해야 합니다.");
         }
 
-        // ==========================================
-        // 💡 여기서부터가 우리 프레임워크의 심장 박동 시작입니다!
-        // ==========================================
-
-        // TODO: 3. 스캐너(DependencyGraphScanner)를 호출해서 필요한 의존성을 싹 다 찾아옵니다.
+        // 3. TargetComponent의 필요한 의존성 조회
         DependencyGraphScanner scanner = new DependencyGraphScanner();
         Set<Class<?>> scannedClasses = scanner.scan(rootClasses);
 
-        // TODO: 4. 찾아온 클래스 목록으로 캐시 키 생성기(SelectiveCacheKeyGenerator)를 돌려 해시를 만듭니다.
-        // SelectiveCacheKeyGenerator keyGenerator = new SelectiveCacheKeyGenerator();
-        // String hashKey = keyGenerator.generateKey(scannedClasses);
+        // 4. 찾아온 클래스 목록으로 캐시 키 생성기(SelectiveCacheKeyGenerator)를 돌려 해시 생성
         String hashKey = "temp-hash-key-123"; // 일단 임시 해시 키
 
-        // 5. 스캔된 클래스 목록과 해시 키를 들고 있는 '작업자(Customizer)'를 생성해서 파견합니다!
-        // return new SelectiveContextCustomizer(scannedClasses, hashKey);
-        return null;
+        // 5. selective context contommizer에게 bean definition을 전부 만들기를 위임
+        return new SelectiveContextCustomizer(scannedClasses, hashKey);
     }
 
 }
