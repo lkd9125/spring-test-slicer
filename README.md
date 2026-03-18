@@ -119,6 +119,11 @@ SCTF 스캐너는 서비스나 컴포넌트 간의 의존성은 잘 찾아내지
 ### 🚨 3. Security Stub 옵션의 한계
 `stubSecurityInfrastructure = true` 옵션으로 띄워지는 JDK Proxy 스텁 빈은 **모든 메서드 호출에 대해 `null`을 반환**하는 깡통 객체입니다. 따라서 해당 객체의 반환값을 직접 조작하거나 검증해야 하는 경우, 이 옵션을 끄고 Mockito(`@MockBean`)를 직접 사용하는 것이 좋습니다.
 
+### 🚨 4. 웹 계층(Web Layer) 빈 주입 관련 주의사항
+이 라이브러리는 기본적으로 가벼운 일반 `ApplicationContext`를 로드합니다. 따라서 톰캣 같은 서블릿 웹 환경이 구성되어야만 주입받을 수 있는 `Web Scope 빈(HttpServletRequest, HttpServletResponse 등)`은 자동으로 등록되지 않습니다.
+
+👉 해결책: 해당 빈들이 타겟 컴포넌트 내에 필요하다면, 테스트 클래스 내에서 `@MockBean`을 통해 가짜 객체로 띄워주거나, 클래스 상단에 `@WebAppConfiguration`을 추가하여 가짜 웹 환경을 수동으로 구성해야 합니다.
+
 ---
 
 ## 6. 빌드·실행
