@@ -55,13 +55,19 @@ SCTF 프레임워크는 프로젝트 규모(Bean 개수)가 커질수록 **Start
 
 ![SCTF 성능 비교 차트](pub/performance_chart.png)
 
-1. KAC-UTM (대규모 프로젝트)
+갱준, 꼼꼼하네! 역시 시니어의 눈은 다르구먼. 😂
 
-<table>
+텍스트가 길어지면 브라우저가 자동으로 줄바꿈을 해버려서 어떤 칸은 뚱뚱해지고 어떤 칸은 홀쭉해지는 건데, 이걸 방지하려면 nowrap 속성을 사용해서 "절대로 줄바꿈 하지 마!"라고 명시해줘야 해. 그리고 모든 표의 가로 길이를 고정(예: width="100%")하면 프로젝트마다 제각각이던 모양이 딱 통일될 거야.
+
+아래 코드로 싹 교체해봐. 텍스트가 한 줄로 예쁘게 펴지고 모든 표가 칼같이 똑같은 크기로 나올 거야.
+
+🚀 성능 비교 (가로 정렬 최적화 버전)
+1. KAC-UTM (대규모 프로젝트)
+<table width="100%">
 <tr>
-<th width="20%">항목</th>
-<th width="40%">@SpringBootTest</th>
-<th width="40%">SCTF</th>
+<th width="25%">항목</th>
+<th width="37.5%">@SpringBootTest</th>
+<th width="37.5%">SCTF</th>
 </tr>
 <tr>
 <td align="center">Bean 수</td>
@@ -75,17 +81,16 @@ SCTF 프레임워크는 프로젝트 규모(Bean 개수)가 커질수록 **Start
 </tr>
 <tr>
 <td align="center">개선율</td>
-<td colspan="2" align="center"><b>약 1.73배 향상 (소요 시간 42% 감소)</b></td>
+<td colspan="2" align="center" nowrap><b>약 1.73배 향상 (소요 시간 42% 감소)</b></td>
 </tr>
 </table>
 
-2. Safety(사이드프로젝트)
-
-<table>
+2. Safety (사이드 프로젝트)
+<table width="100%">
 <tr>
-<th width="20%">항목</th>
-<th width="40%">@SpringBootTest</th>
-<th width="40%">SCTF</th>
+<th width="25%">항목</th>
+<th width="37.5%">@SpringBootTest</th>
+<th width="37.5%">SCTF</th>
 </tr>
 <tr>
 <td align="center">Bean 수</td>
@@ -99,17 +104,16 @@ SCTF 프레임워크는 프로젝트 규모(Bean 개수)가 커질수록 **Start
 </tr>
 <tr>
 <td align="center">개선율</td>
-<td colspan="2" align="center"><b>약 1.53배 향상 (소요 시간 35% 감소)</b></td>
+<td colspan="2" align="center" nowrap><b>약 1.53배 향상 (소요 시간 35% 감소)</b></td>
 </tr>
 </table>
 
-3. GeoBridge(사이드프로젝트)
-
-<table>
+3. GeoBridge (사이드 프로젝트)
+<table width="100%">
 <tr>
-<th width="20%">항목</th>
-<th width="40%">@SpringBootTest</th>
-<th width="40%">SCTF</th>
+<th width="25%">항목</th>
+<th width="37.5%">@SpringBootTest</th>
+<th width="37.5%">SCTF</th>
 </tr>
 <tr>
 <td align="center">Bean 수</td>
@@ -123,10 +127,9 @@ SCTF 프레임워크는 프로젝트 규모(Bean 개수)가 커질수록 **Start
 </tr>
 <tr>
 <td align="center">개선율</td>
-<td colspan="2" align="center"><b>약 1.05배 향상 (소요 시간 5% 감소)</b></td>
+<td colspan="2" align="center" nowrap><b>약 1.05배 향상 (소요 시간 5% 감소)</b></td>
 </tr>
 </table>
-
 ---
 
 ## 📦 주요 특징
