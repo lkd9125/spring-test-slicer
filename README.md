@@ -55,162 +55,29 @@ SCTF 프레임워크는 프로젝트 규모(Bean 개수)가 커질수록 **Start
 
 ![SCTF 성능 비교 차트](pub/performance_chart.png)
 
-🚀 성능 비교
 1. KAC-UTM (대규모 프로젝트)
-<table width="100%">
-<thead>
-<tr>
-<th width="34%">항목</th>
-<th width="33%">@SpringBootTest</th>
-<th width="33%">SCTF</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center">
 
+| 항목 | @SpringBootTest | SCTF |
+|------|----------------|------|
+| Bean 수 | 833개 | 541개 |
+| 실행 시간 | 26,109ms | 15,078ms |
+| 개선율 | - | **약 1.73배 향상 (소요 시간 42% 감소)** |
 
-<b>Bean 수</b>
+2. Safety(사이드프로젝트)
 
+| 항목 | @SpringBootTest | SCTF |
+|------|----------------|------|
+| Bean 수 | 428개 | 270개 |
+| 실행 시간 | 13,467ms | 8,795ms |
+| 개선율 | - | **약 1.53배 향상 (소요 시간 35% 감소)** |
 
-&nbsp;</td>
-<td align="center">833개</td>
-<td align="center">541개</td>
-</tr>
-<tr>
-<td align="center">
+3. GeoBridge(사이드프로젝트)
 
-
-<b>실행 시간</b>
-
-
-&nbsp;</td>
-<td align="center">26,109ms</td>
-<td align="center">15,078ms</td>
-</tr>
-<tr>
-<td align="center">
-
-
-<b>개선율</b>
-
-
-&nbsp;</td>
-<td colspan="2" align="center" nowrap>
-
-
-<b>🚀 약 1.73배 향상 (소요 시간 42% 감소)</b>
-
-
-&nbsp;
-</td>
-</tr>
-</tbody>
-</table>
-
-2. Safety (사이드 프로젝트)
-<table width="100%">
-<thead>
-<tr>
-<th width="34%">항목</th>
-<th width="33%">@SpringBootTest</th>
-<th width="33%">SCTF</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center">
-
-
-<b>Bean 수</b>
-
-
-&nbsp;</td>
-<td align="center">428개</td>
-<td align="center">270개</td>
-</tr>
-<tr>
-<td align="center">
-
-
-<b>실행 시간</b>
-
-
-&nbsp;</td>
-<td align="center">13,467ms</td>
-<td align="center">8,795ms</td>
-</tr>
-<tr>
-<td align="center">
-
-
-<b>개선율</b>
-
-
-&nbsp;</td>
-<td colspan="2" align="center" nowrap>
-
-
-<b>🚀 약 1.53배 향상 (소요 시간 35% 감소)</b>
-
-
-&nbsp;
-</td>
-</tr>
-</tbody>
-</table>
-
-3. GeoBridge (사이드 프로젝트)
-<table width="100%">
-<thead>
-<tr>
-<th width="34%">항목</th>
-<th width="33%">@SpringBootTest</th>
-<th width="33%">SCTF</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center">
-
-
-<b>Bean 수</b>
-
-
-&nbsp;</td>
-<td align="center">302개</td>
-<td align="center">243개</td>
-</tr>
-<tr>
-<td align="center">
-
-
-<b>실행 시간</b>
-
-
-&nbsp;</td>
-<td align="center">8,020ms</td>
-<td align="center">7,658ms</td>
-</tr>
-<tr>
-<td align="center">
-
-
-<b>개선율</b>
-
-
-&nbsp;</td>
-<td colspan="2" align="center" nowrap>
-
-
-<b>🚀 약 1.05배 향상 (소요 시간 5% 감소)</b>
-
-
-&nbsp;
-</td>
-</tr>
-</tbody>
-</table>
+| 항목 | @SpringBootTest | SCTF |
+|------|----------------|------|
+| Bean 수 | 302개 | 243개 |
+| 실행 시간 | 8,020ms | 7,658ms |
+| 개선율 | - | **약 1.05배 향상 (소요 시간 5% 감소)** |
 ---
 
 ## 📦 주요 특징
