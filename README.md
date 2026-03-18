@@ -51,11 +51,33 @@ Constructor / Field Injection 추적
 
 > 실제 프로젝트 기준 테스트 결과
 
+SCTF 프레임워크는 프로젝트 규모(Bean 개수)가 커질수록 **Startup Latency(컨텍스트 초기화 시간) 단축 효과**가 극대화됨을 확인했습니다. 대규모 프로젝트인 KAC-UTM 기준으로 **소요 시간이 42% 감소**하여 TDD 사이클 효율을 크게 향상시켰습니다.
+
+![SCTF vs SpringBootTest Performance Comparison: A clean infographic bar chart showing substantial reduction in Bean Counts and Execution Times across three projects. KAC-UTM shows a 42% reduction, Safety a 35% reduction, and GeoBridge a 5% reduction.](image_0.png)
+
+1. KAC-UTM
+
 | 항목 | @SpringBootTest | SCTF |
 |------|----------------|------|
-| Bean 수 | 약 120개 | 약 25개 |
-| 실행 시간 | 2.8초 | 0.6초 |
-| 개선율 | - | **약 4.6배 향상** |
+| Bean 수 | 833개 | 541개 |
+| 실행 시간 | 26109ms | 15078ms |
+| 개선율 | - | **약 1.73배 향상 (소요 시간 42% 감소)** |
+
+2. Safety(사이드프로젝트)
+
+| 항목 | @SpringBootTest | SCTF |
+|------|----------------|------|
+| Bean 수 | 428개 | 270개 |
+| 실행 시간 | 13467ms | 8795ms |
+| 개선율 | - | **약 1.53배 향상 (소요 시간 35% 감소)** |
+
+3. GeoBridge(사이드프로젝트)
+
+| 항목 | @SpringBootTest | SCTF |
+|------|----------------|------|
+| Bean 수 | 302개 | 243개 |
+| 실행 시간 | 8020ms | 7658ms |
+| 개선율 | - | **약 1.05배 향상 (소요 시간 5% 감소)** |
 
 ---
 
