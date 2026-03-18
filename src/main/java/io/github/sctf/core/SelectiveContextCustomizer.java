@@ -171,7 +171,23 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
                 Proxy.newProxyInstance(
                     clazz.getClassLoader(),
                     new Class<?>[]{clazz},
-                    (proxy, method, args) -> null // 깡통 객체: 어떤 메서드를 호출하든 null을 반환
+                    (proxy, method, args) -> {
+                        String methodName = method.getName();
+                        
+                        // Object 기본 메서드 방어 로직 (NPE 방지)
+                        if ("hashCode".equals(methodName)) {
+                            return System.identityHashCode(proxy);
+                        }
+                        if ("equals".equals(methodName)) {
+                            return proxy == (args != null && args.length > 0 ? args[0] : null);
+                        }
+                        if ("toString".equals(methodName)) {
+                            return "DummyProxy@" + Integer.toHexString(System.identityHashCode(proxy));
+                        }
+                        
+                        // 그 외의 모든 메서드는 기존처럼 깡통(null) 반환
+                        return null;
+                    }
                 )
             );
 
