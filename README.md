@@ -64,8 +64,7 @@ OrderService          ← Target
 
 SCTF 프레임워크는 프로젝트 규모(Bean 개수)가 커질수록 **Startup Latency(컨텍스트 초기화 시간) 단축 효과**가 극대화됨을 확인했습니다. 대규모 프로젝트인 KAC-UTM 기준으로 **소요 시간이 42% 감소**하여 TDD 사이클 효율을 향상시켰습니다.
 
-> - 측정 기준: 동일 테스트 클래스에서 `@BeforeAll` / `@AfterAll` 기준으로
-> - Context 초기화 포함 전체 소요 시간을 측정
+> - 측정 기준: 동일 테스트 클래스에서 `@BeforeAll` / `@AfterAll` 기준으로 Context 초기화 포함 전체 소요 시간을 측정
 
 ![SCTF 성능 비교 차트](pub/performance_chart.png)
 
