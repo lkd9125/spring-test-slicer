@@ -34,22 +34,55 @@
 
 ### 빌드·좌표
 
-- [ ] **Semantic Versioning** 규칙 정하기 (0.x = API 변경 가능, 1.0 = 안정 계약)
-- [ ] **CHANGELOG.md** (또는 GitHub Releases) — 버전별 변경 요약
-- [ ] **groupId / artifactId / version** 최종 확정 (`io.github.sctf:sctf-test-slice`)
+#### 확정된 Maven 좌표
+
+| 항목 | 값 | 위치 |
+|------|-----|------|
+| **groupId** | `io.github.lkd9125` | `build.gradle` → `group` |
+| **artifactId** | `sctf-test-slice` | `settings.gradle` → `rootProject.name` |
+| **version** | 예: `0.1.0` | `build.gradle` → `version` (배포 JAR/POM과 동일) |
+
+소비자 좌표: `io.github.lkd9125:sctf-test-slice:{version}` (README **Maven / Gradle 좌표**와 동일).
+
+#### 릴리즈·버전 관리 — **GitHub 태그** 기준
+
+별도 `CHANGELOG.md` 없이, **태그(및 선택적 GitHub Release)** 로 릴리즈를 구분합니다.
+
+1. **`build.gradle`의 `version`** 을 이번 릴리즈 번호로 올린 뒤 커밋한다.
+2. **Git 태그** `v{version}` 을 같은 커밋에 붙인다.  
+   - 예: `version = '0.2.0'` → 태그 `v0.2.0`  
+   - 태그 이름의 버전과 `build.gradle`의 `version`이 **항상 일치**하도록 할 것.
+3. 태그를 원격에 푸시: `git push origin v0.2.0` (또는 `--tags`).
+4. (선택) GitHub **Releases**에서 해당 태그로 릴리즈를 만들고, 변경 요약을 본문에 적는다.
+
+#### 체크리스트
+
+- [x] **groupId / artifactId** — `io.github.lkd9125` / `sctf-test-slice` 유지
+- [ ] **Semantic Versioning** — 0.x 동안 MINOR에서 API 변경 가능 등, 팀 규칙 한 줄 README 또는 본 문서에 명시
+- [ ] **릴리즈마다** `build.gradle` `version` ↔ Git 태그 `v*` 동기화 습관화
 
 ### 의존성 선언
 
-- [ ] **소비자 입장 점검**: `spring-boot-starter-test`를 `implementation` 둘지, `compileOnly`+문서 둘지 결정
-- [ ] **불필요한 전이 의존 최소화** (공개 시 특히 중요)
+#### 결정 요약 (`build.gradle`과 동일)
 
----
+| 구분 | 내용 |
+|------|------|
+| **`spring-boot-starter-test`** | **`compileOnly`** — 라이브러리 컴파일에만 사용. **발행 POM에 전이되지 않음** (Mockito·AssertJ 등 중복·버전 꼬임 방지). |
+| **이 저장소 테스트** | **`testImplementation`** `spring-boot-starter-test` — `./gradlew test` 런타임에 필요. |
+| **`spring-boot-starter`** | **`implementation`** 유지 — 런타임/슬라이스에 필요한 Spring Boot 코어 계열. |
 
-## 사내/사설 Maven 전용 (Nexus, Artifactory, GitHub Packages 등)
+#### 소비자(앱 프로젝트) 쪽
 
-- [ ] 저장소 URL·인증(credentials)·`publish` 태스크 설정
-- [ ] 스냅샷 vs 릴리즈 저장소 분리 여부 결정
-- [ ] 내부용이면 README에 **“실험/내부 전용”** 한 줄 명시 권장
+- **Gradle:** `testImplementation 'io.github.sctf:sctf-test-slice:…'` 와 함께, Boot 기본처럼 **`testImplementation 'org.springframework.boot:spring-boot-starter-test'`** 가 있어야 함 (대부분 프로젝트에 이미 있음). README **Maven / Gradle 좌표**에 한 줄 명시됨.
+- **Maven:** `sctf-test-slice`를 `<scope>test</scope>` 로 두고, **`spring-boot-starter-test`** 를 테스트 의존성으로 유지.
+
+#### 전이 의존
+
+- starter-test를 POM에 올리지 않아 **불필요한 테스트 스택 전이 최소화**함.
+- 향후 공개 시 `./gradlew publishToMavenLocal` 후 생성 POM에서 `spring-boot-starter-test` 가 **의존성 목록에 없는지** 한 번 확인하면 됨.
+
+- [x] **소비자 입장 점검** — `compileOnly` + README/문서 필수 조합 (`testImplementation` starter-test)
+- [x] **불필요한 전이 의존 최소화** — 위와 같이 starter-test 비전이
 
 ---
 
@@ -57,10 +90,10 @@
 
 ### 법적·메타데이터
 
-- [ ] **LICENSE** 파일 + POM `<licenses>`
-- [ ] **SCM** (`<scm>`: GitHub URL, tag 규칙)
-- [ ] **developers** (`<name>`, `<email>` 등)
-- [ ] **groupId 도메인 검증** (`io.github.<계정>` ↔ GitHub 소유 확인)
+- [x] **LICENSE** 파일 + POM `<licenses>` — 루트 `LICENSE`에 Apache License 2.0, `publishing.publications.mavenJava.pom.licenses`와 일치
+- [x] **SCM** (`<scm>`: GitHub URL, tag 규칙) — `https://github.com/lkd9125/spring-test-slicer`, https/ssh git URL, `tag = 'HEAD'` (릴리즈 시 `v{version}`으로 교체)
+- [x] **developers** (`<id>`, `<name>`, `<email>`, `<url>`) — Gradle `pom.developers`에 `id=lkd9125`, `name=Lee, Kyungdo`, GitHub URL
+- [x] **groupId 도메인 검증** (`io.github.<계정>` ↔ GitHub 소유 확인). 현재 `group = "io.github.lkd9125"` 이고, GitHub 계정도 `lkd9125` 이므로 규칙 충족
 
 ### 아티팩트
 
@@ -83,7 +116,7 @@
 |-----------------|----------------|--------------|
 | README + 예제   | ✅             | ✅           |
 | 자동 테스트     | 권장           | ✅ 필수에 가깝다 |
-| CHANGELOG       | 선택           | ✅           |
+| 변경 요약       | 태그/Release면 충분 | ✅ (CHANGELOG 또는 Release) |
 | LICENSE + POM   | 사내 정책 따름 | ✅ 필수      |
 | GPG + sources/javadoc | —        | ✅ 필수      |
 

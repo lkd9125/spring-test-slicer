@@ -5,8 +5,7 @@ plugins {
 	id 'maven-publish'
 }
 
-group = 'io.github.sctf'
-// 첫 공개용 마이너 버전. 개발 중이면 0.2.0-SNAPSHOT 처럼 바꿔 쓰면 됩니다.
+group = 'io.github.lkd9125'
 version = '0.1.0'
 description = 'SCTF Test Slice — Spring Test selective context (slice integration tests)'
 
@@ -18,8 +17,10 @@ bootJar{
 	enabled = false
 }
 
+// 배포 JAR에는 데모용 example 패키지 미포함 (README·테스트는 로컬 main 소스로 계속 사용)
 jar {
 	enabled = true
+	exclude('io/github/sctf/example/**')
 }
 
 java {
@@ -34,7 +35,9 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
-	implementation 'org.springframework.boot:spring-boot-starter-test'
+	
+	compileOnly 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -42,12 +45,42 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
+
+            pom {
+                name = 'SCTF Test Slice'
+                description = 'Spring Test selective context (slice integration tests)'
+                url = 'https://github.com/lkd9125/spring-test-slicer'
+
+                licenses {
+                    license {
+                        name = 'Apache License 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution = 'repo'
+                    }
+                }
+
+                scm {
+                    url = 'https://github.com/lkd9125/spring-test-slicer'
+                    connection = 'scm:git:https://github.com/lkd9125/spring-test-slicer.git'
+                    developerConnection = 'scm:git:ssh://git@github.com/lkd9125/spring-test-slicer.git'
+                    tag = 'HEAD' // 릴리즈 시 v{version} 으로 교체
+                }
+
+                developers {
+                    developer {
+                        id = 'lkd9125'
+                        name = 'Lee, Kyungdo'
+                        url = 'https://github.com/lkd9125'
+                    }
+                }
+            }
         }
     }
 }
 
-tasks.withType(Javadoc) {
+tasks.withType(Javadoc).configureEach {
     options.encoding = 'UTF-8'
     options.charSet = 'UTF-8'
     options.docEncoding = 'UTF-8'
+    exclude('io/github/sctf/example/**')
 }
