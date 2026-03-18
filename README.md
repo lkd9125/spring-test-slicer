@@ -53,6 +53,8 @@ OrderService, PaymentService, UserService ...
 # SCTF (OrderService 기준 추적 → 필요한 것만)
 OrderService          ← Target
 ├── PaymentService    ← 생성자 주입
+├── UserService       ← 필드 주입
+└── InventoryService  ← PaymentService의 생성자 주입
 ...
 ```
 
