@@ -79,6 +79,19 @@ publishing {
             }
         }
     }
+
+    repositories {
+        // Maven Central (Sonatype) 스테이징 저장소
+        maven {
+            name = "central"
+            // 계정 생성 시 안내된 호스트를 사용하세요. (예: s01.oss.sonatype.org)
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = findProperty("centralUsername") ?: System.getenv("CENTRAL_USERNAME")
+                password = findProperty("centralPassword") ?: System.getenv("CENTRAL_PASSWORD")
+            }
+        }
+    }
 }
 
 signing {
