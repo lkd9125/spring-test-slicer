@@ -53,4 +53,14 @@ public @interface TargetComponentTest {
      */
     String basePackage();
 
+    /**
+     * {@code true}일 때만 Spring Security 자동 설정을 {@code spring.autoconfigure.exclude}로 끄고,
+     * {@code AuthenticationManager} 등에 대한 JDK Proxy 스텁 빈을 등록합니다.
+     * <p>슬라이스 테스트에서 Security 때문에 컨텍스트가 뜨지 않을 때만 켜세요.
+     * 기본값은 {@code false}이며, 일반 앱 테스트에는 불필요한 “깜짝 설정”을 넣지 않습니다.</p>
+     *
+     * @return Security 인프라 스텁·exclude 적용 여부
+     */
+    boolean stubSecurityInfrastructure() default false;
+
 }

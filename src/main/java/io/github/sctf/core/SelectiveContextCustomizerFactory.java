@@ -47,10 +47,11 @@ public class SelectiveContextCustomizerFactory implements ContextCustomizerFacto
             return null;
         }
 
-        // 3. db 자동설정 여부
+        // 3. 테스트 메타 설정
         TargetComponentTest testAnnotation = TestContextAnnotationUtils.findMergedAnnotation(testClass, TargetComponentTest.class);
         boolean withDatabase = (testAnnotation != null) && testAnnotation.withDatabase();
-        String basePackage = testAnnotation.basePackage();
+        String basePackage = (testAnnotation != null) ? testAnnotation.basePackage() : "";
+        boolean stubSecurityInfrastructure = (testAnnotation != null) && testAnnotation.stubSecurityInfrastructure();
 
         // 지정된 value class가 없는 경우 exception
         Class<?>[] rootClasses = targetAnnotation.value();
@@ -64,10 +65,10 @@ public class SelectiveContextCustomizerFactory implements ContextCustomizerFacto
 
         // 5. 찾아온 클래스 목록으로 캐시 키 생성기(SelectiveCacheKeyGenerator)를 돌려 해시 생성
         SelectiveCacheKeyGenerator generator = new SelectiveCacheKeyGenerator();
-        String hashKey = generator.generateKey(scannedClasses); // 일단 임시 해시 키
+        String hashKey = generator.generateKey(scannedClasses, withDatabase, basePackage, stubSecurityInfrastructure);
 
         // 6. selective context contommizer에게 bean definition을 전부 만들기를 위임
-        return new SelectiveContextCustomizer(scannedClasses, hashKey, withDatabase, basePackage);
+        return new SelectiveContextCustomizer(scannedClasses, hashKey, withDatabase, basePackage, stubSecurityInfrastructure);
     }
 
 }

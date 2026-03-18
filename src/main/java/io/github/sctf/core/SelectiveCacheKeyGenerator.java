@@ -28,18 +28,31 @@ public class SelectiveCacheKeyGenerator {
      * @throws RuntimeException SHA-256 알고리즘을 사용할 수 없는 경우
      */
     public String generateKey(Set<Class<?>> scannedClasses) {
-        // 1. 순서 보장을 위해 이름순으로 정렬
+        return generateKey(scannedClasses, true, "", false);
+    }
+
+    /**
+     * 슬라이스 구성(클래스 집합 + 플래그) 전체를 캐시 키에 반영한다.
+     * 동일 클래스 집합이라도 {@code withDatabase}, {@code basePackage}, {@code stubSecurityInfrastructure}가
+     * 다르면 서로 다른 ApplicationContext를 쓰도록 한다.
+     */
+    public String generateKey(Set<Class<?>> scannedClasses, boolean withDatabase, String basePackage,
+            boolean stubSecurityInfrastructure) {
         String joinedNames = scannedClasses.stream()
                 .map(Class::getName)
-                .sorted() // 💡 핵심: 정렬하지 않으면 실행할 때마다 해시가 달라져서 캐시가 다 깨집니다!
+                .sorted()
                 .collect(Collectors.joining(","));
+        String payload = joinedNames
+                + "\0withDatabase=" + withDatabase
+                + "\0basePackage=" + (basePackage != null ? basePackage : "")
+                + "\0stubSecurity=" + stubSecurityInfrastructure;
+        return sha256Hex(payload);
+    }
 
-        // 2. 정렬된 거대한 문자열을 SHA-256 알고리즘으로 압축
+    private static String sha256Hex(String payload) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] encodedHash = digest.digest(joinedNames.getBytes(StandardCharsets.UTF_8));
-
-            // 3. sha 256 암호화
+            byte[] encodedHash = digest.digest(payload.getBytes(StandardCharsets.UTF_8));
             StringBuilder hexString = new StringBuilder(2 * encodedHash.length);
             for (byte b : encodedHash) {
                 String hex = Integer.toHexString(0xff & b);
@@ -49,7 +62,6 @@ public class SelectiveCacheKeyGenerator {
                 hexString.append(hex);
             }
             return hexString.toString();
-
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("해시 알고리즘을 초기화할 수 없습니다.", e);
         }

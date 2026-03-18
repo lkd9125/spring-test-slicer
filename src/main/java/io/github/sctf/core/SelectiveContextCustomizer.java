@@ -44,6 +44,7 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
     private final String hashKey;
     private final boolean withDatabase;
     private final String basePackage;
+    private final boolean stubSecurityInfrastructure;
 
     /**
      * SelectiveContextCustomizer를 생성한다.
@@ -51,13 +52,16 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
      * @param scannedClasses 의존성 그래프에서 탐색된 클래스 집합
      * @param hashKey        컨텍스트 캐싱에 사용되는 SHA-256 해시 키
      * @param withDatabase   Spring 자동 설정(DB, Redis 등) 포함 여부
-     * @param basePackage    컴포넌트 스캔 필터링의 기준 베이스 패키지
+     * @param basePackage                 컴포넌트 스캔 필터링의 기준 베이스 패키지
+     * @param stubSecurityInfrastructure  Security exclude·스텁 빈 적용 여부
      */
-    public SelectiveContextCustomizer(Set<Class<?>> scannedClasses, String hashKey, boolean withDatabase, String basePackage) {
+    public SelectiveContextCustomizer(Set<Class<?>> scannedClasses, String hashKey, boolean withDatabase,
+            String basePackage, boolean stubSecurityInfrastructure) {
         this.scannedClasses = scannedClasses;
         this.hashKey = hashKey;
         this.withDatabase = withDatabase;
         this.basePackage = basePackage;
+        this.stubSecurityInfrastructure = stubSecurityInfrastructure;
     }
 
 
@@ -93,16 +97,18 @@ public class SelectiveContextCustomizer implements ContextCustomizer{
             TestPropertyValues.of("spring.boot.enableautoconfiguration=false").applyTo(context);
         }
 
-        TestPropertyValues.of(
-            "spring.autoconfigure.exclude=" +
-            "org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration," +
-            "org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration," +
-            "org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration," +
-            "org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration"
-        ).applyTo(context);
-
-        registerMockIfPresent(registry, "org.springframework.security.authentication.ReactiveAuthenticationManager", "reactiveAuthenticationManager");
-        registerMockIfPresent(registry, "org.springframework.security.authentication.AuthenticationManager", "authenticationManager");
+        if (stubSecurityInfrastructure) {
+            log.debug("stubSecurityInfrastructure=true: excluding Security auto-config and registering auth manager stubs");
+            TestPropertyValues.of(
+                "spring.autoconfigure.exclude=" +
+                "org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration," +
+                "org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration," +
+                "org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration," +
+                "org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration"
+            ).applyTo(context);
+            registerMockIfPresent(registry, "org.springframework.security.authentication.ReactiveAuthenticationManager", "reactiveAuthenticationManager");
+            registerMockIfPresent(registry, "org.springframework.security.authentication.AuthenticationManager", "authenticationManager");
+        }
 
         Set<Class<?>> concreteClasses = scannedClasses.stream()
                 .filter(clazz -> !clazz.isInterface()) // 인터페이스 컷!

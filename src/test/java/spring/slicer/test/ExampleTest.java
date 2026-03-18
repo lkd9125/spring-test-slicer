@@ -7,7 +7,7 @@ import io.github.sctf.annotation.TargetComponent;
 import io.github.sctf.annotation.TargetComponentTest;
 import io.github.sctf.example.ExampleService;
 
-@TargetComponentTest(basePackage = "")
+@TargetComponentTest(basePackage = "io.github.sctf")
 @TargetComponent({ExampleService.class})
 class ExampleTest {
 

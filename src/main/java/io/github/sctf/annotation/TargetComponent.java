@@ -33,12 +33,4 @@ public @interface TargetComponent {
      */
     Class<?>[] value();
 
-    /**
-     * 부모 클래스의 의존성도 포함할지 여부.
-     * <p>현재 미구현 상태이며, 향후 확장을 위해 예약되어 있다.</p>
-     *
-     * @return 부모 포함 여부 (기본값: {@code true})
-     */
-    boolean includeParents() default true;
-
 }

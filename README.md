@@ -11,6 +11,20 @@ implementation 'io.github.sctf:sctf-test-slice:0.1.0'
 
 > 로컬 개발 중 스냅샷을 쓰려면 `build.gradle`의 `version`을 예: `0.2.0-SNAPSHOT`으로 바꾼 뒤 `publishToMavenLocal` 하면 됩니다.
 
+**배포·공개 전 점검**은 [`docs/PUBLISH_CHECKLIST.md`](docs/PUBLISH_CHECKLIST.md)를 보면 됩니다.
+
+동작 검증용 테스트: `SliceBeanScopeIntegrationTest`, `WithDatabaseFalseIntegrationTest`, `WithDatabaseDefaultIntegrationTest`, `ExampleTest` (`./gradlew test`).
+
+### 누가 쓰나요? · 지원 범위
+
+| 구분 | 내용 |
+|------|------|
+| **대상** | Spring Boot 기반 앱을 **JUnit 5**로 통합 테스트하는 개발자 |
+| **Java** | **17+** (이 저장소는 17 툴체인으로 빌드) |
+| **Spring Boot** | **3.x** 계열을 전제로 함. 라이브러리는 **3.5.11**로 검증·빌드됨. 다른 3.x는 동작할 가능성이 높으나, 사용 전 해당 버전에서 한 번 확인하는 것을 권장 |
+| **테스트 API** | **JUnit Jupiter** (`@Test` 등). `@TargetComponentTest`가 `@ExtendWith(SpringExtension.class)`를 포함 |
+| **사용 위치** | **테스트 소스**(`src/test`)에서만 의존성 추가·애노테이션 사용을 권장 (앱 런타임에는 넣지 않음) |
+
 ---
 
 ## 핵심 아이디어
@@ -39,7 +53,7 @@ implementation 'io.github.sctf:sctf-test-slice:0.1.0'
 예시(프로젝트의 `ExampleTest` 형태):
 
 ```java
-@TargetComponentTest
+@TargetComponentTest(basePackage = "io.github.sctf") // 앱 코드가 있는 패키지 루트
 @TargetComponent({ExampleService.class})
 class ExampleTest {
     @Autowired ExampleService exampleService;
@@ -52,16 +66,18 @@ class ExampleTest {
 
 ### `@TargetComponentTest`
 
-- **`withDatabase()`**: 기본값 `true`  
-  - `false`로 두면 “DB 등 자동 설정”을 끄는 방향으로 동작합니다. (현재는 속성 기반으로 auto-config 비활성화를 시도)
-- **`exclude()`**: 기본값 `{}`  
-  - 슬라이스에서 제외할 클래스를 지정합니다. (의존성 스캔 결과에서 제외 처리)
+- **`basePackage()`** (필수): 의존성 그래프·스캔 필터 기준 패키지. 이 접두사 아래의 `@Component` 계열만 슬라이스 후보로 탐색합니다. (예: `"com.myapp"`)
+- **`withDatabase()`** (기본 `true`): `false`이면 환경에  
+  **`spring.boot.enableautoconfiguration=false`** 를 넣어 **Spring Boot 자동 설정 전체를 끕니다.**  
+  - 이름은 “DB”지만 실제로는 **DataSource뿐 아니라** Redis, JPA, Security auto-config 등 **인프라 자동 설정이 한꺼번에 비활성화**됩니다.  
+  - DB만 끄고 나머지는 두고 싶다면 이 플래그 대신 테스트용 `@SpringBootApplication(exclude = …)` 등을 따로 쓰는 편이 맞습니다.
+- **`stubSecurityInfrastructure()`** (기본 `false`): `true`일 때만  
+  Security 관련 auto-config를 `spring.autoconfigure.exclude`로 제외하고, `AuthenticationManager` 등에 JDK Proxy 스텁 빈을 등록합니다.  
+  **기본값은 끔** — Security를 건드리지 않는 일반 슬라이스 테스트에는 아무 설정도 넣지 않습니다.
 
 ### `@TargetComponent`
 
 - **`value()`**: (필수) 슬라이스의 루트가 되는 클래스(들)
-- **`includeParents()`**: 기본값 `true`  
-  - 현재 코드에서는 **미사용(예약 옵션)** 입니다.
 
 ---
 
@@ -85,18 +101,27 @@ class ExampleTest {
 
 ---
 
-## 제약/주의사항
+## 제약/주의사항 (의존성 그래프 한계)
 
-- **의존성 탐색 범위**: 생성자 주입, 필드 `@Autowired`만 추적합니다. (setter 주입, `@Bean` 메서드 기반 빈 등은 포함되지 않을 수 있음)
-- **대상 제한**: `@Component` 계열로 인식되는 타입만 슬라이스 후보로 취급합니다.
-- **JDK Proxy 더미 빈**: 인터페이스만 프록시 가능하며(구체 클래스 불가), 메서드는 기본적으로 `null`을 반환합니다.
+슬라이스에 **어떤 빈이 들어갈지**는 `DependencyGraphScanner`가 **리플렉션으로 따라가는 경로**로만 결정됩니다.
+
+| 포함되는 경우 | 포함되지 않는 경우(대표) |
+|----------------|-------------------------|
+| 타겟부터 **생성자 파라미터 타입**으로 이어지는 `@Component` 계열 | **setter** `@Autowired` |
+| 타겟/하위 빈의 **필드** `@Autowired` 타입 | `@Configuration`의 **`@Bean` 메서드**로만 제공되는 빈 |
+| `@Service` / `@Component` 등 **메타 `@Component`** 타입 | 인터페이스만 두고 구현체가 그래프에 안 잡힌 경우 |
+| `basePackage` 아래에 있는 클래스 | `basePackage` 밖 타입(라이브러리 내부 구현 등)은 탐색 제외 |
+
+- **JDK Proxy 스텁**(`stubSecurityInfrastructure=true` 시): 인터페이스만 프록시 가능, 메서드는 기본 `null` 반환.
 
 ---
 
-## 요구 사항
+## 요구 사항 (빌드 이 저장소만 할 때)
 
 - **Java**: 17
-- **Spring Boot**: `3.5.11` (Gradle 플러그인 기준)
+- **Spring Boot Gradle Plugin**: `3.5.11`
+
+소비 프로젝트의 Boot 버전은 위 **「지원 범위」** 표를 참고하면 됩니다.
 
 ---
 
