@@ -55,80 +55,161 @@ SCTF 프레임워크는 프로젝트 규모(Bean 개수)가 커질수록 **Start
 
 ![SCTF 성능 비교 차트](pub/performance_chart.png)
 
-갱준, 꼼꼼하네! 역시 시니어의 눈은 다르구먼. 😂
-
-텍스트가 길어지면 브라우저가 자동으로 줄바꿈을 해버려서 어떤 칸은 뚱뚱해지고 어떤 칸은 홀쭉해지는 건데, 이걸 방지하려면 nowrap 속성을 사용해서 "절대로 줄바꿈 하지 마!"라고 명시해줘야 해. 그리고 모든 표의 가로 길이를 고정(예: width="100%")하면 프로젝트마다 제각각이던 모양이 딱 통일될 거야.
-
-아래 코드로 싹 교체해봐. 텍스트가 한 줄로 예쁘게 펴지고 모든 표가 칼같이 똑같은 크기로 나올 거야.
-
-🚀 성능 비교 (가로 정렬 최적화 버전)
+🚀 성능 비교
 1. KAC-UTM (대규모 프로젝트)
 <table width="100%">
+<thead>
 <tr>
-<th width="25%">항목</th>
-<th width="37.5%">@SpringBootTest</th>
-<th width="37.5%">SCTF</th>
+<th width="34%">항목</th>
+<th width="33%">@SpringBootTest</th>
+<th width="33%">SCTF</th>
 </tr>
+</thead>
+<tbody>
 <tr>
-<td align="center">Bean 수</td>
+<td align="center">
+
+
+<b>Bean 수</b>
+
+
+&nbsp;</td>
 <td align="center">833개</td>
 <td align="center">541개</td>
 </tr>
 <tr>
-<td align="center">실행 시간</td>
+<td align="center">
+
+
+<b>실행 시간</b>
+
+
+&nbsp;</td>
 <td align="center">26,109ms</td>
 <td align="center">15,078ms</td>
 </tr>
 <tr>
-<td align="center">개선율</td>
-<td colspan="2" align="center" nowrap><b>약 1.73배 향상 (소요 시간 42% 감소)</b></td>
+<td align="center">
+
+
+<b>개선율</b>
+
+
+&nbsp;</td>
+<td colspan="2" align="center" nowrap>
+
+
+<b>🚀 약 1.73배 향상 (소요 시간 42% 감소)</b>
+
+
+&nbsp;
+</td>
 </tr>
+</tbody>
 </table>
 
 2. Safety (사이드 프로젝트)
 <table width="100%">
+<thead>
 <tr>
-<th width="25%">항목</th>
-<th width="37.5%">@SpringBootTest</th>
-<th width="37.5%">SCTF</th>
+<th width="34%">항목</th>
+<th width="33%">@SpringBootTest</th>
+<th width="33%">SCTF</th>
 </tr>
+</thead>
+<tbody>
 <tr>
-<td align="center">Bean 수</td>
+<td align="center">
+
+
+<b>Bean 수</b>
+
+
+&nbsp;</td>
 <td align="center">428개</td>
 <td align="center">270개</td>
 </tr>
 <tr>
-<td align="center">실행 시간</td>
+<td align="center">
+
+
+<b>실행 시간</b>
+
+
+&nbsp;</td>
 <td align="center">13,467ms</td>
 <td align="center">8,795ms</td>
 </tr>
 <tr>
-<td align="center">개선율</td>
-<td colspan="2" align="center" nowrap><b>약 1.53배 향상 (소요 시간 35% 감소)</b></td>
+<td align="center">
+
+
+<b>개선율</b>
+
+
+&nbsp;</td>
+<td colspan="2" align="center" nowrap>
+
+
+<b>🚀 약 1.53배 향상 (소요 시간 35% 감소)</b>
+
+
+&nbsp;
+</td>
 </tr>
+</tbody>
 </table>
 
 3. GeoBridge (사이드 프로젝트)
 <table width="100%">
+<thead>
 <tr>
-<th width="25%">항목</th>
-<th width="37.5%">@SpringBootTest</th>
-<th width="37.5%">SCTF</th>
+<th width="34%">항목</th>
+<th width="33%">@SpringBootTest</th>
+<th width="33%">SCTF</th>
 </tr>
+</thead>
+<tbody>
 <tr>
-<td align="center">Bean 수</td>
+<td align="center">
+
+
+<b>Bean 수</b>
+
+
+&nbsp;</td>
 <td align="center">302개</td>
 <td align="center">243개</td>
 </tr>
 <tr>
-<td align="center">실행 시간</td>
+<td align="center">
+
+
+<b>실행 시간</b>
+
+
+&nbsp;</td>
 <td align="center">8,020ms</td>
 <td align="center">7,658ms</td>
 </tr>
 <tr>
-<td align="center">개선율</td>
-<td colspan="2" align="center" nowrap><b>약 1.05배 향상 (소요 시간 5% 감소)</b></td>
+<td align="center">
+
+
+<b>개선율</b>
+
+
+&nbsp;</td>
+<td colspan="2" align="center" nowrap>
+
+
+<b>🚀 약 1.05배 향상 (소요 시간 5% 감소)</b>
+
+
+&nbsp;
+</td>
 </tr>
+</tbody>
 </table>
 ---
 
