@@ -5,9 +5,10 @@ plugins {
 	id 'maven-publish'
 }
 
-group = 'io.github.sctf' 
-version = '0.0.1-SNAPSHOT'
-description = 'Spring Selective Context Test Framework'
+group = 'io.github.sctf'
+// 첫 공개용 마이너 버전. 개발 중이면 0.2.0-SNAPSHOT 처럼 바꿔 쓰면 됩니다.
+version = '0.1.0'
+description = 'SCTF Test Slice — Spring Test selective context (slice integration tests)'
 
 tasks.withType(GenerateModuleMetadata).configureEach {
     suppressedValidationErrors.add('dependencies-without-versions')

@@ -1,14 +1,22 @@
-# spring-test-slicer
+# SCTF Test Slice (`sctf-test-slice`)
 
-**원하는 지점(타겟 컴포넌트)부터 의존성 슬라이스만 올려서 통합 테스트를 빠르게 수행**하기 위한 Spring Test 확장 프로젝트입니다.  
+**원하는 지점(타겟 컴포넌트)부터 의존성 슬라이스만 올려서 통합 테스트를 빠르게 수행**하기 위한 Spring Test 확장 라이브러리입니다.  
 `@TargetComponentTest` + `@TargetComponent` 조합으로 “이 지점부터 필요한 빈만” ApplicationContext에 수동 등록합니다.
+
+### Maven / Gradle 좌표
+
+```gradle
+implementation 'io.github.sctf:sctf-test-slice:0.1.0'
+```
+
+> 로컬 개발 중 스냅샷을 쓰려면 `build.gradle`의 `version`을 예: `0.2.0-SNAPSHOT`으로 바꾼 뒤 `publishToMavenLocal` 하면 됩니다.
 
 ---
 
 ## 핵심 아이디어
 
 - **일반 `@SpringBootTest`**: 애플리케이션 전체 컨텍스트를 올리며 느릴 수 있음
-- **spring-test-slicer**: 테스트가 시작되는 “지점”을 지정하고, 그 지점의 **의존성 그래프만** 컨텍스트에 등록
+- **SCTF Test Slice**: 테스트가 시작되는 “지점”을 지정하고, 그 지점의 **의존성 그래프만** 컨텍스트에 등록
 
 즉, “특정 서비스/컴포넌트부터”의 통합 테스트를 **슬라이스 단위**로 수행합니다.
 
