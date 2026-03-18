@@ -1,6 +1,6 @@
 # SCTF Test Slice (`sctf-test-slice`)
 
-> 🚀 **SpringBootTest의 느린 Context 초기화를 해결하기 위한 테스트 최적화 프레임워크**  
+> 🚀 **SpringBootTest의 느린 Context 초기화를 해결하기 위한 테스트 최적화 프레임워크**  
 > 타겟 컴포넌트를 기준으로 **의존성 그래프를 추적하여 필요한 Bean만 로딩**하는 초경량 슬라이스 테스트 라이브러리
 
 ---
@@ -9,9 +9,9 @@
 
 Spring Boot 테스트에서 가장 큰 병목은 `@SpringBootTest`의 **ApplicationContext 초기화 비용**입니다.
 
-- 불필요한 Bean까지 모두 로딩  
-- Context Caching이 깨질 경우 성능 급격히 저하  
-- 테스트 실행 시간이 수 초 이상 증가  
+- 불필요한 Bean까지 모두 로딩  
+- Context Caching이 깨질 경우 성능 급격히 저하  
+- 테스트 실행 시간이 수 초 이상 증가  
 
 기존 슬라이스 테스트의 한계:
 
@@ -31,17 +31,17 @@ Spring Boot 테스트에서 가장 큰 병목은 `@SpringBootTest`의 **Applicat
 
 SCTF는 다음 전략을 사용합니다:
 
-- Reflection 기반 의존성 그래프 추적  
-- 생성자 / 필드 주입을 따라가며 필요한 Bean만 선별  
-- 최소한의 ApplicationContext 구성  
+- Reflection 기반 의존성 그래프 추적  
+- 생성자 / 필드 주입을 따라가며 필요한 Bean만 선별  
+- 최소한의 ApplicationContext 구성  
 
 ```
 Target Component
-   ↓
+   ↓
 Constructor / Field Injection 추적
-   ↓
+   ↓
 연관 Bean 수집
-   ↓
+   ↓
 최소 Context 구성
 ```
 
@@ -53,14 +53,14 @@ Constructor / Field Injection 추적
 
 SCTF 프레임워크는 프로젝트 규모(Bean 개수)가 커질수록 **Startup Latency(컨텍스트 초기화 시간) 단축 효과**가 극대화됨을 확인했습니다. 대규모 프로젝트인 KAC-UTM 기준으로 **소요 시간이 42% 감소**하여 TDD 사이클 효율을 크게 향상시켰습니다.
 
-![SCTF vs SpringBootTest Performance Comparison: A clean infographic bar chart showing substantial reduction in Bean Counts and Execution Times across three projects. KAC-UTM shows a 42% reduction, Safety a 35% reduction, and GeoBridge a 5% reduction.](image_0.png)
+![SCTF 성능 비교 차트](pub/performance_chart.png)
 
-1. KAC-UTM
+1. KAC-UTM (대규모 프로젝트)
 
 | 항목 | @SpringBootTest | SCTF |
 |------|----------------|------|
 | Bean 수 | 833개 | 541개 |
-| 실행 시간 | 26109ms | 15078ms |
+| 실행 시간 | 26,109ms | 15,078ms |
 | 개선율 | - | **약 1.73배 향상 (소요 시간 42% 감소)** |
 
 2. Safety(사이드프로젝트)
@@ -68,7 +68,7 @@ SCTF 프레임워크는 프로젝트 규모(Bean 개수)가 커질수록 **Start
 | 항목 | @SpringBootTest | SCTF |
 |------|----------------|------|
 | Bean 수 | 428개 | 270개 |
-| 실행 시간 | 13467ms | 8795ms |
+| 실행 시간 | 13,467ms | 8,795ms |
 | 개선율 | - | **약 1.53배 향상 (소요 시간 35% 감소)** |
 
 3. GeoBridge(사이드프로젝트)
@@ -76,17 +76,17 @@ SCTF 프레임워크는 프로젝트 규모(Bean 개수)가 커질수록 **Start
 | 항목 | @SpringBootTest | SCTF |
 |------|----------------|------|
 | Bean 수 | 302개 | 243개 |
-| 실행 시간 | 8020ms | 7658ms |
+| 실행 시간 | 8,020ms | 7,658ms |
 | 개선율 | - | **약 1.05배 향상 (소요 시간 5% 감소)** |
 
 ---
 
 ## 📦 주요 특징
 
-- 🎯 타겟 기반 테스트  
-- ⚡ 빠른 실행 속도  
-- 🧩 필요한 Bean만 로딩  
-- 🔧 Spring 구조와 호환되는 테스트 방식 유지  
+- 🎯 타겟 기반 테스트  
+- ⚡ 빠른 실행 속도  
+- 🧩 필요한 Bean만 로딩  
+- 🔧 Spring 구조와 호환되는 테스트 방식 유지  
 
 ---
 
@@ -99,13 +99,13 @@ SCTF 프레임워크는 프로젝트 규모(Bean 개수)가 커질수록 **Start
 @ActiveProfiles("test")
 class OrderServiceTest {
 
-    @Autowired
-    OrderService orderService;
+    @Autowired
+    OrderService orderService;
 
-    @Test
-    void testOrderCreation() {
-        // ...
-    }
+    @Test
+    void testOrderCreation() {
+        // ...
+    }
 }
 ```
 
@@ -129,10 +129,10 @@ class OrderServiceTest {
 
 ### ❗ 지원하지 않는 영역
 
-- `@Bean` 기반 의존성 추적 불가  
-- `@Configuration` 자동 로딩 불가  
-- `@Conditional`, `@Profile` 미지원  
-- 외부 라이브러리 Bean 자동 탐색 제한  
+- `@Bean` 기반 의존성 추적 불가  
+- `@Configuration` 자동 로딩 불가  
+- `@Conditional`, `@Profile` 미지원  
+- 외부 라이브러리 Bean 자동 탐색 제한  
 
 👉 반드시 필요한 설정은 `@Import`로 수동 등록 필요
 
@@ -169,17 +169,17 @@ SCTF는 모든 테스트를 대체하기 위한 도구가 아닙니다.
 
 ## 🧠 이런 상황에 적합합니다
 
-- Service 레이어 단위 테스트  
-- 빠른 피드백이 중요한 테스트  
-- Bean 수가 많아 테스트가 느린 프로젝트  
+- Service 레이어 단위 테스트  
+- 빠른 피드백이 중요한 테스트  
+- Bean 수가 많아 테스트가 느린 프로젝트  
 
 ---
 
 ## 🚫 이런 경우는 비추천
 
-- 복잡한 AutoConfiguration 의존 구조  
-- Security / AOP 핵심 로직 테스트  
-- 이벤트 기반 구조  
+- 복잡한 AutoConfiguration 의존 구조  
+- Security / AOP 핵심 로직 테스트  
+- 이벤트 기반 구조  
 
 ---
 
