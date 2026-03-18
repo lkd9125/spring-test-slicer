@@ -45,3 +45,4 @@ _docker
 CLAUDE.md
 docs
 .claude
+private-key-backup.asc

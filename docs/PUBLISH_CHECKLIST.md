@@ -97,10 +97,10 @@
 
 ### 아티팩트
 
-- [ ] **GPG 서명** (배포 JAR/POM)
-- [ ] **sources JAR** (`java.withSourcesJar()`)
-- [ ] **javadoc JAR** (`java.withJavadocJar()`), Javadoc 경고/실패 처리
-- [ ] **POM 필수 필드** 누락 없이 통과 (Central 규칙)
+- [x] **GPG 서명** (배포 JAR/POM) — GPG 키 생성 후 Gradle `signing` 플러그인으로 `pom`/`jar`/`sources`/`javadoc`에 `.asc` 생성 (`publishToMavenLocal` 확인)
+- [x] **sources JAR** (`java.withSourcesJar()`) — `build/libs/*-sources.jar` 생성 확인
+- [x] **javadoc JAR** (`java.withJavadocJar()`), Javadoc 경고/실패 처리 — `build/libs/*-javadoc.jar` 생성. 현재 경고는 있으나 빌드 성공
+- [x] **POM 필수 필드** 누락 없이 통과 (Central 규칙) — `publishToMavenLocal` 결과 POM에 `name`/`description`/`url`/`licenses`/`developers`/`scm` 존재
 
 ### 프로세스
 
