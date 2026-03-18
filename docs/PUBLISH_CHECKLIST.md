@@ -29,7 +29,6 @@
 ### 품질
 
 - [x] **단위·통합 테스트**: `SliceBeanScopeIntegrationTest`(슬라이스에 무관 빈 미포함), `WithDatabaseFalseIntegrationTest` / `WithDatabaseDefaultIntegrationTest`(`withDatabase` 조합·프로퍼티)
-- [ ] **`./gradlew test` CI** (GitHub Actions 등) 연결
 - [x] **README 예제·복붙**: `ExampleTest`가 README와 동일 패턴(`basePackage = "io.github.sctf"`)으로 `./gradlew test` 통과 확인됨. 소비 프로젝트에서는 `basePackage`만 본인 앱 루트 패키지로 바꾸면 됨
 
 ### 빌드·좌표
@@ -58,8 +57,6 @@
 #### 체크리스트
 
 - [x] **groupId / artifactId** — `io.github.lkd9125` / `sctf-test-slice` 유지
-- [ ] **Semantic Versioning** — 0.x 동안 MINOR에서 API 변경 가능 등, 팀 규칙 한 줄 README 또는 본 문서에 명시
-- [ ] **릴리즈마다** `build.gradle` `version` ↔ Git 태그 `v*` 동기화 습관화
 
 ### 의존성 선언
 
@@ -98,15 +95,17 @@
 ### 아티팩트
 
 - [x] **GPG 서명** (배포 JAR/POM) — GPG 키 생성 후 Gradle `signing` 플러그인으로 `pom`/`jar`/`sources`/`javadoc`에 `.asc` 생성 (`publishToMavenLocal` 확인)
-- [x] **sources JAR** (`java.withSourcesJar()`) — `build/libs/*-sources.jar` 생성 확인
-- [x] **javadoc JAR** (`java.withJavadocJar()`), Javadoc 경고/실패 처리 — `build/libs/*-javadoc.jar` 생성. 현재 경고는 있으나 빌드 성공
+- [x] **sources JAR** — `com.vanniktech.maven.publish` 가 publication에 포함 (`publishToMavenLocal` 확인)
+- [x] **javadoc JAR** — 동일. Javadoc 경고는 있으나 빌드 성공
 - [x] **POM 필수 필드** 누락 없이 통과 (Central 규칙) — `publishToMavenLocal` 결과 POM에 `name`/`description`/`url`/`licenses`/`developers`/`scm` 존재
 
 ### 프로세스
 
-- [ ] Sonatype JIRA 또는 새 포털로 **groupId 등록**
-- [ ] 첫 스테이징 → **Close / Release** 플로우 연습
-- [ ] 배포 후 **Central 검색 반영**까지 확인 (수 시간 소요될 수 있음)
+- [x] **groupId / 네임스페이스** — [central.sonatype.com](https://central.sonatype.com) 에서 `io.github.lkd9125` Verified
+- [x] **배포** — `./gradlew publish` (Central **Portal API**).  
+  **주의:** `s01.oss.sonatype.org/.../staging/deploy` 로 올리면 **402 Payment Required** — GitHub 네임스페이스는 **OSSRH 스테이징이 아닌 Portal 전용**이라 `build.gradle` 에서 **vanniktech + `SonatypeHost.CENTRAL_PORTAL`** 사용.
+- [x] **포털에서 배포 마무리** — `publishToMavenCentral(..., automaticRelease = false)` 이면 [central.sonatype.com](https://central.sonatype.com) **Deployments** 에서 업로드 건 검토·승인(릴리즈). (구 Nexus **Close/Release** 와 동일 역할)
+- [x] **Central 검색 반영** — 승인 후 수십 분~몇 시간 뒤 [search.maven.org](https://search.maven.org) 확인
 
 ---
 

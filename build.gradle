@@ -2,13 +2,19 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.11'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'maven-publish'
-	id 'signing'
+	id 'com.vanniktech.maven.publish' version '0.36.0'
 }
 
 group = 'io.github.lkd9125'
 version = '0.1.0'
 description = 'SCTF Test Slice — Spring Test selective context (slice integration tests)'
+
+// Central Portal API용 토큰 (vanniktech: mavenCentralUsername/Password).
+// ~/.gradle/gradle.properties 의 centralUsername·centralPassword 와 동일하게 써도 됨.
+def portalUser = findProperty('mavenCentralUsername') ?: findProperty('centralUsername') ?: System.getenv('CENTRAL_USERNAME')
+def portalPass = findProperty('mavenCentralPassword') ?: findProperty('centralPassword') ?: System.getenv('CENTRAL_PASSWORD')
+if (portalUser) ext.mavenCentralUsername = portalUser
+if (portalPass) ext.mavenCentralPassword = portalPass
 
 tasks.withType(GenerateModuleMetadata).configureEach {
     suppressedValidationErrors.add('dependencies-without-versions')
@@ -28,8 +34,7 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(17)
 	}
-    withSourcesJar()
-    withJavadocJar()
+	// sources/javadoc JAR는 vanniktech maven-publish가 중복 없이 붙임
 }
 
 repositories {
@@ -44,59 +49,45 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
+mavenPublishing {
+	coordinates('io.github.lkd9125', 'sctf-test-slice', version.toString())
 
-            pom {
-                name = 'SCTF Test Slice'
-                description = 'Spring Test selective context (slice integration tests)'
-                url = 'https://github.com/lkd9125/spring-test-slicer'
+	pom {
+		name = 'SCTF Test Slice'
+		description = 'Spring Test selective context (slice integration tests)'
+		url = 'https://github.com/lkd9125/spring-test-slicer'
 
-                licenses {
-                    license {
-                        name = 'Apache License 2.0'
-                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution = 'repo'
-                    }
-                }
+		licenses {
+			license {
+				name = 'Apache License 2.0'
+				url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+				distribution = 'repo'
+			}
+		}
 
-                scm {
-                    url = 'https://github.com/lkd9125/spring-test-slicer'
-                    connection = 'scm:git:https://github.com/lkd9125/spring-test-slicer.git'
-                    developerConnection = 'scm:git:ssh://git@github.com/lkd9125/spring-test-slicer.git'
-                    tag = 'v0.1.0'
-                }
+		scm {
+			url = 'https://github.com/lkd9125/spring-test-slicer'
+			connection = 'scm:git:https://github.com/lkd9125/spring-test-slicer.git'
+			developerConnection = 'scm:git:ssh://git@github.com/lkd9125/spring-test-slicer.git'
+			tag = 'v0.1.0'
+		}
 
-                developers {
-                    developer {
-                        id = 'lkd9125'
-                        name = 'Lee, Kyungdo'
-                        url = 'https://github.com/lkd9125'
-                    }
-                }
-            }
-        }
-    }
+		developers {
+			developer {
+				id = 'lkd9125'
+				name = 'Lee, Gyeongdo'
+				url = 'https://github.com/lkd9125'
+			}
+		}
+	}
 
-    repositories {
-        // Maven Central (Sonatype) 스테이징 저장소
-        maven {
-            name = "central"
-            // 계정 생성 시 안내된 호스트를 사용하세요. (예: s01.oss.sonatype.org)
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials {
-                username = findProperty("centralUsername") ?: System.getenv("CENTRAL_USERNAME")
-                password = findProperty("centralPassword") ?: System.getenv("CENTRAL_PASSWORD")
-            }
-        }
-    }
+	// Central Portal API 전용 (0.34+ 기본). OSSRH URL은 402 — SonatypeHost/import 불필요
+	publishToMavenCentral(false)
+	signAllPublications()
 }
 
 signing {
-    useGpgCmd()
-    sign publishing.publications.mavenJava
+	useGpgCmd()
 }
 
 tasks.withType(Javadoc).configureEach {
